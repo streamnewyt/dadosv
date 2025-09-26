@@ -1,0 +1,35 @@
+# Nome da sua GitHub Action
+name: Fetch Volcanic Emissions Data
+
+# Define quando a Action deve rodar
+on:
+  # Roda automaticamente a cada 12 horas
+  schedule:
+    - cron: '0 */12 * * *'
+  # Permite que você rode a Action manualmente a qualquer momento pela aba "Actions" do GitHub
+  workflow_dispatch:
+
+jobs:
+  fetch-and-commit:
+    # Roda em um servidor Linux virtual (padrão e mais comum)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Faz o "checkout" do seu repositório para que a Action possa trabalhar com ele
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # 2. Busca os dados da API da Smithsonian e salva no arquivo emissions_data.json
+      - name: Fetch data from Smithsonian API
+        run: |
+          curl -o emissions_data.json "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=GVP-VOTW%3AE3WebApp_Emissions&maxFeatures=50&outputFormat=application%2Fjson"
+
+      # 3. Faz o commit e push do novo arquivo emissions_data.json para o seu repositório
+      - name: Commit and push if data changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Atualização automática dos dados de emissões vulcânicas"
+          file_pattern: emissions_data.json
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "actions@github.com"
+          commit_author: "GitHub Actions Bot <actions@github.com>"
