@@ -9,6 +9,10 @@ on:
   # Permite que você rode a Action manualmente a qualquer momento pela aba "Actions" do GitHub
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+
 jobs:
   fetch-and-commit:
     # Roda em um servidor Linux virtual (padrão e mais comum)
